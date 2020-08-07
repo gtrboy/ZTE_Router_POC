@@ -2,13 +2,14 @@ import paho.mqtt.client as mqtt
 import sys,os,logging
 import ssl
 
-CAFILE = "ca-true.crt"
+CAFILE = "ca.crt"
 CERTFILE = "cloudserver.crt"
 PRIVATEKEY = "cloudserver.key"
 LOGFILE = "zte8820.log"
 KEYPASSWORD = "12qwaszx"
-#TOPIC="#"
-TOPIC = "HN5RN6KHCA03374"
+TARGET = "" ###### device SN
+TOPIC = TARGET
+PAYLOAD = ""   ###### Publish empty payload
 #HOST = "hn5-auth.ztehome.com.cn"
 #PORT = 8883
 HOST = "rot-01.ztehome.com.cn"
@@ -39,7 +40,7 @@ def onConnect(client, userdata, flags, rc):
     if(rc!=0):
         print("connect error, rc: {}".format(rc))
     else:
-        client.subscribe(TOPIC)
+        client.publish(TOPIC, PAYLOAD)
 
 def onMessage(client, userdata, message):
     topic = message.topic
@@ -54,14 +55,6 @@ mqttClient = mqtt.Client()
 fp = open(LOGFILE,'a+')
 mqttClient.on_connect = onConnect
 mqttClient.on_message = onMessage
-'''
-mqttClient.tls_set(ca_certs=CAFILE,
-                   certfile=CERTFILE,
-                   cert_reqs=ssl.CERT_REQUIRED,
-                   tls_version=ssl.PROTOCOL_TLSv1_2,
-                   keyfile=PRIVATEKEY,
-                   ciphers=KEYPASSWORD)
-'''
 ssl_context = ssl_alpn()
 mqttClient.tls_set_context(context=ssl_context)
 mqttClient.tls_insecure_set(True)
